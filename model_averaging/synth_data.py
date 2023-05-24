@@ -16,7 +16,6 @@ def poly_model_lsqfit(t, p, Nt, m=2):
         if i==0 or i==1:
             ans += p[f"a{i}"] * (-(t-Nt) / Nt) ** i
         else:
-#             ans += (t<8)*(p[f"a{i}"] * (t / Nt) ** i)
             ans += p[f"a{i}"] * (-(t-Nt) / Nt) ** i
     return ans
 
@@ -35,7 +34,6 @@ def multi_exp_model_lsqfit(t, p, Nexc=2):
         if i==0:
             ans += p["A{}".format(i)] * np.exp(-p["E{}".format(i)] * t)
         else:
-#             ans += (t<12)*p["A{}".format(i)] * np.exp(-p["E{}".format(i)] * t)
             ans += p["A{}".format(i)] * np.exp(-p["E{}".format(i)] * t)
     return ans
 
