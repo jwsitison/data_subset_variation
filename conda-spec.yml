@@ -1,0 +1,15 @@
+name: data_subset_variation
+channels:
+  - conda-forge
+dependencies:
+  - pip
+  - jupyter
+  - python=3.8
+  - numpy=1.19.5
+  - matplotlib=3.3.3
+  - seaborn=0.11.1
+  - jax=0.3.15
+  - pip:
+    - gvar==11.9.1
+    - lsqfit==11.7
+    - vegas==5.1.1
