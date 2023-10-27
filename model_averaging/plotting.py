@@ -113,7 +113,7 @@ def plot_gvcorr(
 
     return eplot
 
-def plot_MA_result(test_res, IC_list=['BAIC_perf', 'BAIC_BMW'], target_value=None, show_IC_ratios=False, indv_plot_key='indv', ylim=None, xlim=None):
+def plot_MA_result(test_res, IC_list=['BAIC_perf', 'BAIC_BMW'], target_value=None, show_IC_ratios=False, indv_plot_key='indv', ylim=None, xlim=None, legend_labels=None):
     """
     Creates plot of model average results.
     Args:
@@ -124,6 +124,7 @@ def plot_MA_result(test_res, IC_list=['BAIC_perf', 'BAIC_BMW'], target_value=Non
       indv_plot_key: Used to specify color of individual fit results
       ylim: y-axis limits for first panel of plot
       xlim: x-axis limits for all panels of plot
+      legend_labels: labels for plot legend
     """
     
     if show_IC_ratios:
@@ -145,6 +146,9 @@ def plot_MA_result(test_res, IC_list=['BAIC_perf', 'BAIC_BMW'], target_value=Non
     IC_x_coordn_start = 1.5
     IC_x_coordn_space = 1.0
     x_tick_spacing = 4
+    
+    if target_value is not None:
+        plt.axhline(target_value, color='k', linestyle='--', lw=2)
         
     IC_x_coordn = IC_x_coordn_start
     for IC in IC_list:
@@ -168,8 +172,6 @@ def plot_MA_result(test_res, IC_list=['BAIC_perf', 'BAIC_BMW'], target_value=Non
     ax1.set_ylim(ylim[0],ylim[1])
     plt.setp(ax1.get_xticklabels(), visible=False)
 
-    if target_value is not None:
-        plt.axhline(target_value, color='k', linestyle='--', lw=2)
 
     ax2 = plt.subplot(gs[1])
 
@@ -177,17 +179,20 @@ def plot_MA_result(test_res, IC_list=['BAIC_perf', 'BAIC_BMW'], target_value=Non
     Q_norm = test_res['Qs']
 
     for IC in IC_list:
-        plt.plot(test_res[x_coordn], p_norm[IC], color=IC_color[IC], linestyle=IC_linestyle[IC], label='pr$(M|D)$ ('+IC+')')
+        plt.plot(test_res[x_coordn], p_norm[IC], color=IC_color[IC], linestyle=IC_linestyle[IC], label='p$(M|D)$ ('+IC+')')
 
     ax2r = ax2.twinx()
     ax2r.plot(test_res[x_coordn], np.asarray(Q_norm), color=IC_color['naive'], linestyle=IC_linestyle['naive'], label='Fit $p$-value')  # Note: fit prob != model prob! 
 
     ax2.xaxis.set_major_locator(ticker.MultipleLocator(x_tick_spacing))
     plt.yticks([0,np.max(p_norm[IC_list[0]])])
-    ax2.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: '0' if x == 0 else '{:.2f}'.format(x)))
+    ax2.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: '0' if x == 0 else '{:.1f}'.format(x)))
 
-    ax2.set_ylabel(r'${\rm pr}$')
+    ax2.set_ylabel(r'$p$')
+#     ax2.set_ylabel(r'${\rm pr}$')
     ax2.set_xlim(xlim[0],xlim[1])
+#     ax2.set_ylim([0,1])
+#     ax2.set_yticks([0,1])
 
     ax2r.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: '0' if x == 0 else '{:.1f}'.format(x)))
     ax2r.set_ylabel('Q')
@@ -202,19 +207,22 @@ def plot_MA_result(test_res, IC_list=['BAIC_perf', 'BAIC_BMW'], target_value=Non
         ax3.xaxis.set_major_locator(ticker.MultipleLocator(x_tick_spacing))
 
         for IC in IC_list[1:]:
-#             plt.plot(test_res[x_coordn], p_norm[IC] / p_norm[IC_list[0]], color=IC_color[IC], linestyle=IC_linestyle[IC], label='pr$(M|D)$ ('+IC+')/pr$(M|D)$ ('+IC_list[0]+')')
-            plt.plot(test_res[x_coordn], p_norm[IC] / p_norm[IC_list[0]], color='k', linestyle='-', label='pr$(M|D)$ ('+IC+')/pr$(M|D)$ ('+IC_list[0]+')')
+#             plt.plot(test_res[x_coordn], p_norm[IC] / p_norm[IC_list[0]], color=IC_color[IC], linestyle=IC_linestyle[IC], label='p$(M|D)$ ('+IC+')/p$(M|D)$ ('+IC_list[0]+')')
+            plt.plot(test_res[x_coordn], p_norm[IC] / p_norm[IC_list[0]], color='k', linestyle='-', label='p$(M|D)$ ('+IC+')/p$(M|D)$ ('+IC_list[0]+')')
 
         ax3.set_xlabel(x_label)
-#         ax3.set_ylabel(r'$pr / pr_{\rm '+IC_list[0]+'}$')
+#         ax3.set_ylabel(r'$p / p_{\rm '+IC_list[0]+'}$')
         ax3.set_ylabel(r'r')
         ax3.set_xlim(xlim[0],xlim[1])
     else:
         ax2.set_xlabel(x_label)
         
+    if legend_labels is not None:
+        fig.legend(legend_labels, loc='center right', bbox_to_anchor=(1.25, 0.5), fontsize=12)
+        
          
         
-def plot_MA_result_scaling(obs_est_vs_Nsamp, Nsamp_array, IC_list=['BAIC', 'BPIC', 'PPIC'], fixed_list=[], target_value=None, indv_plot_key='indv', ylim=None, xlim=None):
+def plot_MA_result_scaling(obs_est_vs_Nsamp, Nsamp_array, IC_list=['BAIC', 'BPIC', 'PPIC'], fixed_list=[], target_value=None, indv_plot_key='indv', ylim=None, xlim=None, legend_labels=None):
     """
     Creates N-scaling plot of model average results.
     Args:
@@ -226,6 +234,7 @@ def plot_MA_result_scaling(obs_est_vs_Nsamp, Nsamp_array, IC_list=['BAIC', 'BPIC
       indv_plot_key: Used to specify color of individual fit results
       ylim: y-axis limits for first panel of plot
       xlim: x-axis limits for all panels of plot
+      legend_labels: labels for plot legend
     Returns:
       ax: matplotlib axis object for the figure
     """
@@ -259,9 +268,13 @@ def plot_MA_result_scaling(obs_est_vs_Nsamp, Nsamp_array, IC_list=['BAIC', 'BPIC
         
     plt.yticks(np.arange(ylim[0], ylim[1]+1, step=0.4))
         
-    ax.set_xlabel(r'$\log(N)$')
+#     ax.set_xlabel(r'$\log(N)$')
+    ax.set_xlabel(r'$\ln(N)$')
     ax.set_ylabel(y_label)
     ax.set_xlim(xlim[0],xlim[-1])
     ax.set_ylim(ylim[0],ylim[-1])
+    
+    if legend_labels is not None:
+        ax.legend(legend_labels)
     
     return ax
